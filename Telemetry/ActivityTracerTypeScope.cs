@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Telemetry
+namespace Telemetry.TraceSource
 {
     /// <summary>
     /// Base on http://www.codeproject.com/Articles/185666/ActivityTracerScope-Easy-activity-tracing-with
@@ -79,7 +79,7 @@ namespace Telemetry
         /// <param name="traceSource">TraceSource to use to log activity</param>
         /// <param name="activityType">Activity type of the current activity</param>
         public ActivityTracerScope(
-            TraceSource traceSource,
+            System.Diagnostics.TraceSource traceSource,
             ActivityEnumType activityType = default(ActivityEnumType)
         ) : base(
                 traceSource,
@@ -98,7 +98,7 @@ namespace Telemetry
         public ActivityTracerScope(
             string traceName,
             ActivityEnumType activityType = default(ActivityEnumType)
-        ) : this(new TraceSource(traceName), activityType)
+        ) : this(new System.Diagnostics.TraceSource(traceName), activityType)
         {
         }
     }

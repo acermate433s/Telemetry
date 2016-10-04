@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Telemetry
+namespace Telemetry.TraceSource
 {
     /// <summary>
     /// Base on http://www.codeproject.com/Articles/185666/ActivityTracerScope-Easy-activity-tracing-with
@@ -21,7 +21,7 @@ namespace Telemetry
         /// <summary>
         /// Current TraceSource
         /// </summary>
-        public TraceSource TraceSource { get; protected set; }
+        public System.Diagnostics.TraceSource TraceSource { get; protected set; }
 
         /// <summary>
         /// User-defined ID for the activity
@@ -39,7 +39,7 @@ namespace Telemetry
         /// <param name="activityName">User-defined name for the current activity</param>
         /// <param name="activityID">User-defined id for the current activity</param>
         public ActivityTracerScope(
-            TraceSource traceSource,
+            System.Diagnostics.TraceSource traceSource,
             string activityName = "",
             int activityID = 0
         )
@@ -73,7 +73,7 @@ namespace Telemetry
             string traceName,
             string activityName = "",
             int activityID = 0
-        ) : this(new TraceSource(traceName), activityName, activityID)
+        ) : this(new System.Diagnostics.TraceSource(traceName), activityName, activityID)
         {
         }
 
