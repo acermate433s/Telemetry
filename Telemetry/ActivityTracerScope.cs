@@ -9,14 +9,19 @@ namespace Telemetry.TraceSource
     public class ActivityTracerScope : ILogger
     {
         /// <summary>
+        /// Flag to indicate if instance is disposed
+        /// </summary>
+        private bool _Disposed = false;
+
+        /// <summary>
         /// Previous ID before TransferTrace
         /// </summary>
-        protected Guid PreviousID { get; set; }
+        protected Guid PreviousId { get; set; }
 
         /// <summary>
         /// ID for the current TransferTrace
         /// </summary>
-        protected Guid CurrentID { get; set; }
+        protected Guid CurrentId { get; set; }
 
         /// <summary>
         /// Current TraceSource
@@ -26,7 +31,7 @@ namespace Telemetry.TraceSource
         /// <summary>
         /// User-defined ID for the activity
         /// </summary>
-        public int ActivityID { get; protected set; }
+        public int ActivityId { get; protected set; }
 
         /// <summary>
         /// User-defined name for the activity
@@ -37,30 +42,30 @@ namespace Telemetry.TraceSource
         /// </summary>
         /// <param name="traceSource">TraceSource to use to log activity</param>
         /// <param name="activityName">User-defined name for the current activity</param>
-        /// <param name="activityID">User-defined id for the current activity</param>
+        /// <param name="activityId">User-defined id for the current activity</param>
         public ActivityTracerScope(
             System.Diagnostics.TraceSource traceSource,
             string activityName = "",
-            int activityID = 0
+            int activityId = 0
         )
         {
             TraceSource = traceSource;
-            ActivityID = activityID;
+            ActivityId = activityId;
             ActivityName = activityName;
 
             // remember the previous activity ID so we could come back to it
             // later when we switch back to the previous activity before this
-            PreviousID = Trace.CorrelationManager.ActivityId;
+            PreviousId = Trace.CorrelationManager.ActivityId;
 
             // create a new ID for the current activity; we would need this
             // when we when call TraceEvent with TraceEventType.Stop
-            CurrentID = Guid.NewGuid();
+            CurrentId = Guid.NewGuid();
 
             // transfer to a new activity and then start the trace event
-            if (PreviousID != Guid.Empty)
-                TraceSource.TraceTransfer(ActivityID, "Transferring to new activity", CurrentID);
-            Trace.CorrelationManager.ActivityId = CurrentID;
-            TraceSource.TraceEvent(TraceEventType.Start, ActivityID, ActivityName);
+            if (PreviousId != Guid.Empty)
+                TraceSource.TraceTransfer(ActivityId, "Transferring to new activity", CurrentId);
+            Trace.CorrelationManager.ActivityId = CurrentId;
+            TraceSource.TraceEvent(TraceEventType.Start, ActivityId, ActivityName);
         }
 
         /// <summary>
@@ -68,24 +73,40 @@ namespace Telemetry.TraceSource
         /// </summary>
         /// <param name="traceName">Name for the soon-to-be created TraceSource to use to log activity</param>
         /// <param name="activityName">User-defined name for the current activity</param>
-        /// <param name="activityID">User-defined id for the current activity</param>
+        /// <param name="activityId">User-defined ID for the current activity</param>
         public ActivityTracerScope(
             string traceName,
             string activityName = "",
-            int activityID = 0
-        ) : this(new System.Diagnostics.TraceSource(traceName), activityName, activityID)
+            int activityId = 0
+        ) : this(new System.Diagnostics.TraceSource(traceName), activityName, activityId)
         {
+        }
+
+        ~ActivityTracerScope()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_Disposed)
+            {
+                if (PreviousId != Guid.Empty)
+                    TraceSource.TraceTransfer(ActivityId, "Transferring back to previous activity", PreviousId);
+                TraceSource.TraceEvent(TraceEventType.Stop, ActivityId, ActivityName);
+                Trace.CorrelationManager.ActivityId = PreviousId;
+
+                _Disposed = true;
+            }
         }
 
         /// <summary>
         /// Transfer to the previous activity and then stop the current trace event
         /// </summary>
         public void Dispose()
-        {
-            if (PreviousID != Guid.Empty)
-                TraceSource.TraceTransfer(ActivityID, "Transferring back to previous activity", PreviousID);
-            TraceSource.TraceEvent(TraceEventType.Stop, ActivityID, ActivityName);
-            Trace.CorrelationManager.ActivityId = PreviousID;
+        {   
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -93,12 +114,15 @@ namespace Telemetry.TraceSource
         /// </summary>
         public void Log(LogEntry entry)
         {
+            if (entry == null)
+                throw new ArgumentNullException(nameof(entry), "Log entry cannot be null");
+
             if (entry.Exception != null)
             {
                 TraceSource
                     .TraceData(
                         (TraceEventType) entry.Severity,
-                        ActivityID,
+                        ActivityId,
                         new[]
                         {
                             entry.Datum == null ? entry.Message : String.Format(entry.Message, entry.Datum),
@@ -114,7 +138,7 @@ namespace Telemetry.TraceSource
                 TraceSource
                     .TraceData(
                         (TraceEventType) entry.Severity, 
-                        ActivityID, 
+                        ActivityId, 
                         entry.Datum
                     );
             }
@@ -123,22 +147,29 @@ namespace Telemetry.TraceSource
                 TraceSource
                     .TraceEvent(
                         (TraceEventType) entry.Severity,
-                        ActivityID,
+                        ActivityId,
                         entry.Message,
                         entry.Datum
                     );
             }
         }
 
+        public ILogger CreateScope()
+        {
+            return CreateScope("", 0);
+        }
+
         /// <summary>
         /// Create a new instance.  The new instance could be enclosed inside a using statement to start an an activity.
         /// </summary>
         /// <param name="activityName">Name of the activity</param>
-        /// <param name="activityID">Optional activity ID</param>
+        /// <param name="activityId">Optional activity ID</param>
         /// <returns></returns>
-        public ILogger CreateScope(string activityName = "", int activityID = 0)
+        public ILogger CreateScope(string activityName, int activityId)
         {
-            return new ActivityTracerScope(this.TraceSource, activityName, activityID);
+            return new ActivityTracerScope(this.TraceSource, activityName, activityId);
         }
+
+
     }
 }

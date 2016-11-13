@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Based on http://stackoverflow.com/questions/5646820/logger-wrapper-best-practice
 /// </summary>
 namespace Telemetry
 {
-    internal class Constants
+    internal static class Constants
     {
         internal const string DEFAULT_MESSAGE = "";
         internal const object[] DEFAULT_DATUM = null;
         internal const Exception DEFAULT_EXCEPTION = null;
     }
 
-    public enum Severity
+    public enum SeverityType
     {
+        None = 0,
         Critical = TraceEventType.Critical,
         Error = TraceEventType.Error,
         Information = TraceEventType.Information,
@@ -26,18 +28,20 @@ namespace Telemetry
     {
         void Log(LogEntry entry);
 
-        ILogger CreateScope(string activityName = "", int activityID = 0);
+        ILogger CreateScope();
+
+        ILogger CreateScope(string activityName, int activityId);
     }
 
     public class LogEntry
     {
-        public readonly Severity Severity;
-        public readonly string Message = Constants.DEFAULT_MESSAGE;
-        public readonly object[] Datum = Constants.DEFAULT_DATUM;
-        public readonly Exception Exception = Constants.DEFAULT_EXCEPTION;
+        internal readonly SeverityType Severity;
+        internal readonly string Message = Constants.DEFAULT_MESSAGE;
+        internal readonly object[] Datum = Constants.DEFAULT_DATUM;
+        internal readonly Exception Exception = Constants.DEFAULT_EXCEPTION;
 
         public LogEntry(
-            Severity severity,
+            SeverityType severity,
             string message = Constants.DEFAULT_MESSAGE,
             object[] datum = Constants.DEFAULT_DATUM,
             Exception exception = Constants.DEFAULT_EXCEPTION
@@ -63,7 +67,7 @@ namespace Telemetry
         public bool IsData()
         {
             return
-                (Message == Constants.DEFAULT_MESSAGE || Exception == Constants.DEFAULT_EXCEPTION)
+                (String.IsNullOrEmpty(Message) || Exception == Constants.DEFAULT_EXCEPTION)
                 && Datum != Constants.DEFAULT_DATUM
                 && Datum.Length >= 1;
         }
@@ -78,6 +82,9 @@ namespace Telemetry
             params object[] args
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
@@ -92,7 +99,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    Severity.Critical,
+                    SeverityType.Critical,
                     message,
                     args,
                     exception
@@ -105,12 +112,15 @@ namespace Telemetry
             Exception exception
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
             logger.Log(
                 new LogEntry(
-                    Severity.Critical,
+                    SeverityType.Critical,
                     exception: exception
                 )
             );
@@ -122,12 +132,15 @@ namespace Telemetry
             object[] datum
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
             logger.Log(
                 new LogEntry(
-                    Severity.Critical,
+                    SeverityType.Critical,
                     datum: datum
                 )
             );
@@ -140,12 +153,15 @@ namespace Telemetry
             params object[] args
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
             logger.Log(
                 new LogEntry(
-                    Severity.Error,
+                    SeverityType.Error,
                     message,
                     args,
                     exception
@@ -158,12 +174,15 @@ namespace Telemetry
             Exception exception
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
             logger.Log(
                 new LogEntry(
-                    Severity.Error,
+                    SeverityType.Error,
                     exception: exception
                 )
             );
@@ -175,12 +194,15 @@ namespace Telemetry
             object[] datum
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
             logger.Log(
                 new LogEntry(
-                    Severity.Error,
+                    SeverityType.Error,
                     datum: datum,
                     exception: exception
                 )
@@ -193,9 +215,12 @@ namespace Telemetry
             params object[] args
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Information,
+                    SeverityType.Information,
                     message,
                     args
                 )
@@ -207,9 +232,12 @@ namespace Telemetry
             object[] datum
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Information,
+                    SeverityType.Information,
                     datum: datum
                 )
             );
@@ -221,9 +249,15 @@ namespace Telemetry
             params object[] args
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
+            if (String.IsNullOrEmpty(message))
+                throw new ArgumentNullException(nameof(message), "Message cannot be empty");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Verbose,
+                    SeverityType.Verbose,
                     message,
                     args
                 )
@@ -235,9 +269,12 @@ namespace Telemetry
             object[] datum
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Verbose,
+                    SeverityType.Verbose,
                     datum: datum
                 )
             );
@@ -249,9 +286,15 @@ namespace Telemetry
             params object[] args
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
+            if (String.IsNullOrEmpty(message))
+                throw new ArgumentNullException(nameof(message), "Message cannot be null");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Warning,
+                    SeverityType.Warning,
                     message,
                     args
                 )
@@ -263,9 +306,12 @@ namespace Telemetry
             object[] datum
         )
         {
+            if (logger == null)
+                throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+
             logger.Log(
                 new LogEntry(
-                    Severity.Warning,
+                    SeverityType.Warning,
                     datum: datum
                 )
             );

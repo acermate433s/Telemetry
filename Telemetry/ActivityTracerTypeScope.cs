@@ -2,14 +2,22 @@
 using System.ComponentModel;
 using System.Diagnostics;
 
+[assembly: CLSCompliant(false)]
 namespace Telemetry.TraceSource
 {
     /// <summary>
     /// Base on http://www.codeproject.com/Articles/185666/ActivityTracerScope-Easy-activity-tracing-with
     /// </summary>
-    public class ActivityTracerScope<ActivityEnumType> : ActivityTracerScope where ActivityEnumType : struct, IConvertible, IComparable, IFormattable
+    public class ActivityTracerScope<TActivityEnumType> : ActivityTracerScope where TActivityEnumType : struct, IConvertible, IComparable, IFormattable
     {
-        public readonly ActivityEnumType Activity;
+        private readonly TActivityEnumType _Activity;
+
+        public TActivityEnumType Activity {
+            get
+            {
+                return _Activity;
+            }
+        }
 
         /// <summary>
         /// Activity ID
@@ -17,7 +25,7 @@ namespace Telemetry.TraceSource
         /// <remarks>
         /// Integer representation of the enumeration
         /// </remarks>
-        public new int ActivityID
+        public new int ActivityId
         {
             get
             {
@@ -45,7 +53,7 @@ namespace Telemetry.TraceSource
         /// <param name="activityType"></param>
         /// <returns></returns>
         private static string GetDescription(
-            ActivityEnumType activityType
+            TActivityEnumType activityType
         )
         {
             // default would be the ToString() method of the ActivityEnum
@@ -68,10 +76,10 @@ namespace Telemetry.TraceSource
         /// <summary>
         /// Makes sure that ActivityEnumType is an enumeration type
         /// </summary>
-        static ActivityTracerScope()
+        internal ActivityTracerScope() : base(String.Empty)
         {
-            if (!typeof(ActivityEnumType).IsEnum)
-                throw new NotSupportedException($"{nameof(ActivityEnumType)} must be an enumerated type");
+            if (!typeof(TActivityEnumType).IsEnum)
+                throw new ArgumentException("TActivityEnumType must be an enumerated type");
         }
 
         /// <summary>
@@ -80,14 +88,14 @@ namespace Telemetry.TraceSource
         /// <param name="activityType">Activity type of the current activity</param>
         public ActivityTracerScope(
             System.Diagnostics.TraceSource traceSource,
-            ActivityEnumType activityType = default(ActivityEnumType)
+            TActivityEnumType activityType = default(TActivityEnumType)
         ) : base(
                 traceSource,
                 GetDescription(activityType),
                 activityType.ToInt32(null)
         )
         {
-            Activity = activityType;
+            _Activity = activityType;
         }
 
         /// <summary>
@@ -97,7 +105,7 @@ namespace Telemetry.TraceSource
         /// <param name="activityType">Activity type of the current activity</param>
         public ActivityTracerScope(
             string traceName,
-            ActivityEnumType activityType = default(ActivityEnumType)
+            TActivityEnumType activityType = default(TActivityEnumType)
         ) : this(new System.Diagnostics.TraceSource(traceName), activityType)
         {
         }
