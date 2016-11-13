@@ -52,8 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActivityTracerTypeScope.cs" />
-    <Compile Include="ActivityTracerScope.cs" />
+    <Compile Include="TraceSource\ActivityTracerTypeScope.cs" />
+    <Compile Include="TraceSource\ActivityTracerScope.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
