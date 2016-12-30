@@ -30,6 +30,8 @@ namespace Telemetry
 
         ILogger CreateScope();
 
+        ILogger CreateScope(string activityName);
+
         ILogger CreateScope(string activityName, int activityId);
     }
 

@@ -18,6 +18,10 @@ namespace Telemetry.TraceSource
         /// </summary>
         protected Guid PreviousId { get; set; }
 
+        protected string PreviousActivityName { get; set; }
+
+        protected int PreviousActivityID { get; set; }
+
         /// <summary>
         /// ID for the current TransferTrace
         /// </summary>
@@ -53,19 +57,21 @@ namespace Telemetry.TraceSource
             ActivityId = activityId;
             ActivityName = activityName;
 
-            // remember the previous activity ID so we could come back to it
-            // later when we switch back to the previous activity before this
-            PreviousId = Trace.CorrelationManager.ActivityId;
-
             // create a new ID for the current activity; we would need this
             // when we when call TraceEvent with TraceEventType.Stop
             CurrentId = Guid.NewGuid();
 
+            // remember the previous activity ID so we could come back to it
+            // later when we switch back to the previous activity before this
+            PreviousId = Trace.CorrelationManager.ActivityId;
+
             // transfer to a new activity and then start the trace event
             if (PreviousId != Guid.Empty)
-                TraceSource.TraceTransfer(ActivityId, "Transferring to new activity", CurrentId);
-            Trace.CorrelationManager.ActivityId = CurrentId;
+                TraceSource.TraceTransfer(ActivityId, $"Transferring to new activity", CurrentId);
+
             TraceSource.TraceEvent(TraceEventType.Start, ActivityId, ActivityName);
+
+            Trace.CorrelationManager.ActivityId = CurrentId;
         }
 
         /// <summary>
@@ -91,9 +97,12 @@ namespace Telemetry.TraceSource
         {
             if (!_Disposed)
             {
-                if (PreviousId != Guid.Empty)
-                    TraceSource.TraceTransfer(ActivityId, "Transferring back to previous activity", PreviousId);
                 TraceSource.TraceEvent(TraceEventType.Stop, ActivityId, ActivityName);
+
+                // transfer back to the previous activity
+                if (PreviousId != Guid.Empty)
+                    TraceSource.TraceTransfer(ActivityId, $"Transferring back to previous activity", PreviousId);
+
                 Trace.CorrelationManager.ActivityId = PreviousId;
 
                 _Disposed = true;
@@ -154,9 +163,22 @@ namespace Telemetry.TraceSource
             }
         }
 
+        /// <summary>
+        /// Create a new instance with a blank activity name.  The new instance could be enclosed inside a using statement to start an an activity.
+        /// </summary>
         public ILogger CreateScope()
         {
             return CreateScope("", 0);
+        }
+
+        /// <summary>
+        /// Create a new instance.  The new instance could be enclosed inside a using statement to start an an activity.
+        /// </summary>
+        /// <param name="activityName">Name of the activity</param>
+        /// <returns></returns>
+        public ILogger CreateScope(string activityName)
+        {
+            return new ActivityTracerScope(this.TraceSource, activityName, 0);
         }
 
         /// <summary>
@@ -169,7 +191,5 @@ namespace Telemetry.TraceSource
         {
             return new ActivityTracerScope(this.TraceSource, activityName, activityId);
         }
-
-
     }
 }
