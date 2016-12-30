@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Telemetry")]
-[assembly: AssemblyDescription("Logging for .NET")]
+[assembly: AssemblyDescription("A simple &amp; generic logging library for .NET.  A sample implementation that uses System.Diagnostics.TraceSource is included.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Adrian Demavivas")]
 [assembly: AssemblyProduct("Telemetry")]

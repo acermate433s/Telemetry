@@ -3,14 +3,18 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>$title$</title>
+    <title>.NET $title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>https://github.com/acermate433s/Telemetry</projectUrl>
+    <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixed bug when transferring to and from an activity.</releaseNotes>
+    <summary>A simple &amp; generic logging library for .NET</summary>    
     <copyright>Copyright 2016</copyright>
+    <language>en-US</language>
     <tags>.net logging</tags>
+    <releaseNotes>Fixed bug when transferring to and from an activity.</releaseNotes>
   </metadata>
 </package>
