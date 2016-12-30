@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/acermate433s/Telemetry</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Fixed bug when transferring to and from an activity.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>.net logging</tags>
+  </metadata>
+</package>
