@@ -20,7 +20,7 @@ namespace Telemetry.TraceSource
 
         protected string PreviousActivityName { get; set; }
 
-        protected int PreviousActivityID { get; set; }
+        protected int PreviousActivityId { get; set; }
 
         /// <summary>
         /// ID for the current TransferTrace
@@ -138,7 +138,7 @@ namespace Telemetry.TraceSource
                             entry.Exception.GetType().FullName,
                             entry.Exception.Message,
                             entry.Exception.Source,
-                            entry.Exception.StackTrace,
+                            entry.Exception.StackTrace
                         }
                     );
             }

@@ -105,7 +105,7 @@ namespace Telemetry.Proxy
                     .First()?
                     .Message ?? "";
 
-            if (message != "")
+            if (!String.IsNullOrEmpty(message))
                 logger.Information(message);
 
             try

@@ -10,7 +10,7 @@ namespace Telemetry.Proxy.Attributes
     /// </summary>
     /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Method)]
-    public class ActivityAttribute : Attribute
+    public sealed class ActivityAttribute : Attribute
     {
         public ActivityAttribute()
         {

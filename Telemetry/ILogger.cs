@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
-/// <summary>
-/// Based on http://stackoverflow.com/questions/5646820/logger-wrapper-best-practice
-/// </summary>
 namespace Telemetry
 {
     internal static class Constants
@@ -14,7 +10,8 @@ namespace Telemetry
         internal const Exception DEFAULT_EXCEPTION = null;
     }
 
-    public enum SeverityType
+    [Flags]
+    public enum SeverityTypes
     {
         None = 0,
         Critical = TraceEventType.Critical,
@@ -37,13 +34,13 @@ namespace Telemetry
 
     public class LogEntry
     {
-        internal readonly SeverityType Severity;
+        internal readonly SeverityTypes Severity;
         internal readonly string Message = Constants.DEFAULT_MESSAGE;
         internal readonly object[] Datum = Constants.DEFAULT_DATUM;
         internal readonly Exception Exception = Constants.DEFAULT_EXCEPTION;
 
         public LogEntry(
-            SeverityType severity,
+            SeverityTypes severity,
             string message = Constants.DEFAULT_MESSAGE,
             object[] datum = Constants.DEFAULT_DATUM,
             Exception exception = Constants.DEFAULT_EXCEPTION
@@ -101,7 +98,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Critical,
+                    SeverityTypes.Critical,
                     message,
                     args,
                     exception
@@ -122,7 +119,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Critical,
+                    SeverityTypes.Critical,
                     exception: exception
                 )
             );
@@ -142,7 +139,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Critical,
+                    SeverityTypes.Critical,
                     datum: datum
                 )
             );
@@ -163,7 +160,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Error,
+                    SeverityTypes.Error,
                     message,
                     args,
                     exception
@@ -184,7 +181,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Error,
+                    SeverityTypes.Error,
                     exception: exception
                 )
             );
@@ -204,7 +201,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Error,
+                    SeverityTypes.Error,
                     datum: datum,
                     exception: exception
                 )
@@ -222,7 +219,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Information,
+                    SeverityTypes.Information,
                     message,
                     args
                 )
@@ -239,7 +236,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Information,
+                    SeverityTypes.Information,
                     datum: datum
                 )
             );
@@ -259,7 +256,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Verbose,
+                    SeverityTypes.Verbose,
                     message,
                     args
                 )
@@ -276,7 +273,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Verbose,
+                    SeverityTypes.Verbose,
                     datum: datum
                 )
             );
@@ -296,7 +293,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Warning,
+                    SeverityTypes.Warning,
                     message,
                     args
                 )
@@ -313,7 +310,7 @@ namespace Telemetry
 
             logger.Log(
                 new LogEntry(
-                    SeverityType.Warning,
+                    SeverityTypes.Warning,
                     datum: datum
                 )
             );

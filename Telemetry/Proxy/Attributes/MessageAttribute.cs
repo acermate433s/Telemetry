@@ -10,7 +10,7 @@ namespace Telemetry.Proxy.Attributes
     /// </summary>
     /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Method)]
-    public class MessageAttribute : Attribute
+    public sealed class MessageAttribute : Attribute
     {
         public MessageAttribute(
             string message
